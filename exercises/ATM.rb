@@ -1,38 +1,86 @@
-@balance = 100.00
-#command = null
+class ATM
+    def initialize(capacity, balance)
+      @capacity = capacity
+      @balance = balance
+      @passWord = '1234'
+    end
+
+    attr_accessor :capacity, :balance, :passWord
+end
+
+class Person
+  def initialize(balance)
+    @balance = balance
+  end
+
+  attr_accessor :balance
+end
+
+atm1 = ATM.new(1000, 900)
+person1 = Person.new(500)
+
+atm2 = ATM.new(1000, 900)
+person2 = Person.new(500)
 
 #######FUNCTIONS######
-def withdraw(amount)
+def withdraw(person, atm, amount)
   puts "Starting Balance "
-  displayBalance(@balance)
+  displayBalance(person)
   puts "
   withdraw amount = $#{amount}."
 
-if amount > @balance
-      puts "Not enough funds
-      "
-      sleep(2)
-    else
-      @balance -= amount
-      puts "New balance "
-      displayBalance(@balance)
+  if amount > person.balance
+        puts "Not enough funds
+        "
+        sleep(2)
+  elsif amount > atm.balance
+    puts "Sorry, not enough money inside ATM"
+    sleep(2)
+  else
+    person.balance -= amount
+    atm.balance -= amount
+    puts "New balance "
+    displayBalance(person)
     sleep(2)
   end
 end
 
-def deposit(amount)
-  puts "Starting Balance $#{@balance}.
+def deposit(person, atm, amount)
+  puts "Starting Balance $#{person.balance}.
   deposit amount $#{amount}."
-  @balance += amount
-  puts "New balance "
-  displayBalance(@balance)
-  sleep(2)
+  if amount > (atm.capacity - atm.balance)
+    puts "Sorry, Not enough space in ATM to deposit that amount."
+    sleep(2)
+  elsif
+    person.balance += amount
+    atm.balance += amount
+    puts "New balance "
+    displayBalance(person)
+    sleep(2)
+  end
 end
 
-def displayBalance(balance)
+def displayBalance(person)
+  balance = person.balance
   money = "%.2f" % (balance / 1.0)
   puts "$#{money} "
 
+end
+
+def authenticate(pin, atm)
+  pin == atm.passWord
+end
+
+def adminMenu(atm)
+  puts "
+************************
+
+  ATM Balance: #{atm.balance}
+  ATM capacity: #{atm.capacity}
+
+************************"
+
+  sleep(2)
 end
 
 def New
@@ -59,16 +107,7 @@ end
 
 #######MAIN CODE######
 
-puts "Hi welcome to your ATM.
-Are you a new or existing user?
-
-1) New
-2) existing
-
->Please enter 1 or 2"
-
-
-
+puts "Hi welcome to your ATM."
 loop do
   puts "
   Would you like to
@@ -76,27 +115,38 @@ loop do
   2) withdraw funds
   3) deposit funds
   4) Exit
+  5) ATM Admin
 
-  Please type 1,2,3 or 4"
+  Please type 1,2,3,4 or 5"
   selection = gets.to_i
   #if !(1..4).include? selection
 
   if selection == 1
     puts ""
     puts "Your balance is "
-    displayBalance(@balance)
+    displayBalance(person1)
     sleep(2)
   elsif selection == 2
     puts "ok, please enter an amount"
     amount = gets.to_f
-    withdraw(amount)
+    withdraw(person1, atm1, amount)
   elsif selection == 3
     puts "ok, please enter an amount"
     amount = gets.to_f
-    deposit(amount)
+    deposit(person1, atm1, amount)
   elsif selection == 4
-  puts "Exiting"
+    puts "Exiting"
     exit
+  elsif selection == 5
+    puts "
+    Please enter admin PIN:"
+    pass = gets.chomp
+    if authenticate(pass, atm1)
+      adminMenu(atm1)
+    else
+      puts "Wrong PIN"
+      sleep(2)
+    end
   else
     puts "Sorry, please enter a valid option."
     next
